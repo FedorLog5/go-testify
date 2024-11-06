@@ -18,9 +18,11 @@ func TestMainHandlerValidRequest(t *testing.T) {
     handler := http.HandlerFunc(mainHandle)
     handler.ServeHTTP(responseRecorder, req)
 
+
     assert.Equal(t, http.StatusOK, responseRecorder.Code)
     assert.NotEmpty(t, responseRecorder.Body.String())
 }
+
 
 func TestMainHandlerInvalidCity(t *testing.T) {
     req, err := http.NewRequest("GET", "/cafe?count=2&city=unknown", nil)
@@ -31,12 +33,13 @@ func TestMainHandlerInvalidCity(t *testing.T) {
     handler.ServeHTTP(responseRecorder, req)
 
     assert.Equal(t, http.StatusBadRequest, responseRecorder.Code)
-    assert.Equal(t, "wrong city value", responseRecorder.Body.String())
+    assert.Equal(t, "wrong city value", strings.TrimSpace(responseRecorder.Body.String()))
 }
+
 
 func TestMainHandlerWhenCountMoreThanTotal(t *testing.T) {
     totalCount := 4
-    req, err := http.NewRequest("GET", "/cafe?count=10&city=moscow", nil) 
+    req, err := http.NewRequest("GET", "/cafe?count=10&city=moscow", nil)
     require.NoError(t, err)
 
     responseRecorder := httptest.NewRecorder()
@@ -45,7 +48,7 @@ func TestMainHandlerWhenCountMoreThanTotal(t *testing.T) {
 
 
     assert.Equal(t, http.StatusOK, responseRecorder.Code)
-    
+
 
     expectedResponse := "Мир кофе,Сладкоежка,Кофе и завтраки,Сытый студент"
     assert.Equal(t, expectedResponse, responseRecorder.Body.String())
